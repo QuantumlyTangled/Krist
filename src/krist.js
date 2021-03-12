@@ -93,7 +93,7 @@ Krist.genGenesis = async function () {
   const r = getRedis();
 
   if (!await r.exists("genesis-genned")) {
-    schemas.block.create({
+    await schemas.block.create({
       value: 50,
       hash: "0000000000000000000000000000000000000000000000000000000000000000",
       address: "0000000000",
