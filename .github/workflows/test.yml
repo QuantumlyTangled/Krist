@@ -30,10 +30,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn --frozen-lockfile
 
       - name: Run tests
-        run: npm test
+        run: yarn run test
         env: 
           DB_HOST: mariadb
           DB_PORT: ${{ job.services.mariadb.ports[3306] }}
