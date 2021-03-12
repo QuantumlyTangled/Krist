@@ -31,6 +31,8 @@ services:
       - PUBLIC_URL=krist.ceriat.net
       - DB_HOST=db
       - REDIS_HOST=redis
+      - MINING_ENABLED=true
+      - GEN_GENESIS=true
     ports:
       - "127.0.0.1:8080:8080"
     restart: always
