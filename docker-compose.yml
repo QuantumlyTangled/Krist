@@ -1,0 +1,42 @@
+version: "2.0"
+services:
+  redis:
+    container_name: "redis"
+    image: "redis:alpine"
+    volumes:
+      - redis-data:/data
+    restart: always
+
+  db:
+    container_name: "db"
+    image: "mariadb"
+    environment:
+      - MYSQL_ROOT_PASSWORD=krist
+      - MYSQL_USER=krist
+      - MYSQL_PASSWORD=krist
+      - MYSQL_DATABASE=krist
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+
+  krist:
+    image: "ghcr.io/tmpim/krist:latest"
+    depends_on:
+      - redis
+      - db
+    environment:
+      - DB_USER=krist
+      - DB_PASS=krist
+      - DB_NAME-krist
+      - PUBLIC_URL=krist.ceriat.net
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: always
+
+volumes:
+  mysql-data:
+    external: true
+  redis-data:
+    external: true
