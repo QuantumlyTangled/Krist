@@ -20,7 +20,7 @@ services:
     restart: always
 
   krist:
-    image: "ghcr.io/tmpim/krist:latest"
+    image: "ghcr.io/quantumlytangled/krist:latest"
     depends_on:
       - redis
       - db
