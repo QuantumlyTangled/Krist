@@ -87,6 +87,7 @@ The following optional environment variables may also be specified:
 | `REDIS_PREFIX` | `krist:` | The prefix of the redis keys. |
 | `TEST_REDIS_PREFIX` | `test_krist:` | *Required for testing*. If `NODE_ENV` is `test` (e.g. running Jest), the prefix of the redis keys. |
 | `MINING_ENABLED` | `false` | If mining should be enabled. |
+| `GEN_GENESIS` | `false` | If Krist should force generate a genesis block. |
 | `NODE_ENV` | `development` | Either `development` or `production`. If `development`, the Krist server runs in debug mode. |
 | `FORCE_INSECURE` | `false` | If `true`, force the websocket gateway to return `ws://` URLs instead of `wss://`. Used for development only. |
 | `GITHUB_TOKEN` |  | Any valid GitHub token (e.g. a PAT with no scopes) to obtain avatars for the homepage. Completely optional. |

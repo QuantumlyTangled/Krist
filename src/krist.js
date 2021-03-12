@@ -19,19 +19,19 @@
  * For more project information, see <https://github.com/tmpim/krist>.
  */
 
-function Krist() {}
+function Krist() { }
 
 module.exports = Krist;
 
 require("./websockets.js"); // hack to deal with circular deps
-const utils        = require("./utils.js");
-const constants    = require("./constants.js");
-const schemas      = require("./schemas.js");
-const chalk        = require("chalk");
+const utils = require("./utils.js");
+const constants = require("./constants.js");
+const schemas = require("./schemas.js");
+const chalk = require("chalk");
 const { getRedis } = require("./redis.js");
 
 const { cleanAuthLog } = require("./addresses.js");
-const cron             = require("node-cron");
+const cron = require("node-cron");
 
 const addressRegex = /^(?:k[a-z0-9]{9}|[a-f0-9]{10})$/;
 const addressRegexV2 = /^k[a-z0-9]{9}$/;
@@ -47,7 +47,7 @@ Krist.freeNonceSubmission = false;
 
 Krist.workOverTime = [];
 
-Krist.init = async function() {
+Krist.init = async function () {
   console.log(chalk`{bold [Krist]} Loading...`);
 
   // Check if mining is enabled
@@ -59,8 +59,10 @@ Krist.init = async function() {
   } else {
     const miningEnabled = await Krist.isMiningEnabled();
     if (miningEnabled) console.log(chalk`{green.bold [Krist]} Mining is enabled.`);
-    else               console.log(chalk`{red.bold [Krist]} Mining is disabled!`);
+    else console.log(chalk`{red.bold [Krist]} Mining is disabled!`);
   }
+
+  if (process.env.GEN_GENESIS === "true") await Krist.genGenesis();
 
   // Check for a genesis block
   const lastBlock = await schemas.block.findOne({ order: [["id", "DESC"]] });
@@ -77,7 +79,7 @@ Krist.init = async function() {
   console.log(chalk`{bold [Krist]} Current work: {green ${await Krist.getWork()}}`);
 
   // Update the work over time every minute
-  Krist.workOverTimeInterval = setInterval(async function() {
+  Krist.workOverTimeInterval = setInterval(async function () {
     await r.lpush("work-over-time", await Krist.getWork());
     await r.ltrim("work-over-time", 0, 1440);
   }, 60 * 1000);
@@ -87,47 +89,63 @@ Krist.init = async function() {
   cleanAuthLog().catch(console.error);
 };
 
+Krist.genGenesis = async function () {
+  const r = getRedis();
+
+  if (!await r.exists("genesis-genned")) {
+    schemas.block.create({
+      value: 50,
+      hash: "0000000000000000000000000000000000000000000000000000000000000000",
+      address: "0000000000",
+      nonce: 0,
+      difficulty: 4294967295,
+      time: new Date()
+    });
+    await r.set("genesis-genned", "true");
+  }
+}
+
 Krist.isMiningEnabled = async () => (await getRedis().get("mining-enabled")) === "true";
 
-Krist.getWork = async function() {
+Krist.getWork = async function () {
   return parseInt(await getRedis().get("work"));
 };
 
-Krist.getWorkOverTime = async function() {
+Krist.getWorkOverTime = async function () {
   return (await getRedis().lrange("work-over-time", 0, 1440))
     .map(i => parseInt(i))
     .reverse();
 };
 
-Krist.setWork = async function(work) {
+Krist.setWork = async function (work) {
   await getRedis().set("work", work);
 };
 
-Krist.getWalletVersion = function() {
+Krist.getWalletVersion = function () {
   return constants.walletVersion;
 };
 
-Krist.getMoneySupply = function() {
+Krist.getMoneySupply = function () {
   return schemas.address.sum("balance");
 };
 
-Krist.getMinWork = function() {
+Krist.getMinWork = function () {
   return constants.minWork;
 };
 
-Krist.getMaxWork = function() {
+Krist.getMaxWork = function () {
   return constants.maxWork;
 };
 
-Krist.getWorkFactor = function() {
+Krist.getWorkFactor = function () {
   return constants.workFactor;
 };
 
-Krist.getSecondsPerBlock = function() {
+Krist.getSecondsPerBlock = function () {
   return constants.secondsPerBlock;
 };
 
-Krist.makeV2Address = function(key) {
+Krist.makeV2Address = function (key) {
   const chars = ["", "", "", "", "", "", "", "", ""];
   let prefix = "k";
   let hash = utils.sha256(utils.sha256(key));
@@ -152,26 +170,26 @@ Krist.makeV2Address = function(key) {
   return prefix;
 };
 
-Krist.isValidKristAddress = function(address, v2Only) {
+Krist.isValidKristAddress = function (address, v2Only) {
   return v2Only
     ? addressRegexV2.test(address)
     : addressRegex.test(address);
 };
 
-Krist.isValidKristAddressList = function(addressList) {
+Krist.isValidKristAddressList = function (addressList) {
   return addressListRegex.test(addressList);
 };
 
-Krist.isValidName = function(name, fetching) {
+Krist.isValidName = function (name, fetching) {
   const re = fetching ? nameFetchRegex : nameRegex;
   return re.test(name) && name.length > 0 && name.length < 65;
 };
 
-Krist.isValidARecord = function(ar) {
+Krist.isValidARecord = function (ar) {
   return ar && ar.length > 0 && ar.length <= 255 && aRecordRegex.test(ar);
 };
 
-Krist.stripNameSuffix = function(name) {
+Krist.stripNameSuffix = function (name) {
   if (!name) return "";
 
   // TODO: Support custom name suffixes (see KristWeb v2 code for safe RegExp
@@ -179,7 +197,7 @@ Krist.stripNameSuffix = function(name) {
   return name.replace(/\.kst$/, "");
 };
 
-Krist.getMOTD = async function() {
+Krist.getMOTD = async function () {
   const r = getRedis();
   const motd = await r.get("motd") || "Welcome to Krist!";
   const date = new Date(await r.get("motd:date"));
@@ -191,7 +209,7 @@ Krist.getMOTD = async function() {
   };
 };
 
-Krist.setMOTD = async function(motd) {
+Krist.setMOTD = async function (motd) {
   const r = getRedis();
   await r.set("motd", motd);
   await r.set("motd:date", (new Date()).toString());
