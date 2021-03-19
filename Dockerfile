@@ -1,8 +1,4 @@
-FROM node:14-alpine
-
-RUN \
-    npm install yarn -g --no-progress && \
-    npm cache clean --force --no-progress
+FROM node:15
 
 WORKDIR /usr/src/krist
 
