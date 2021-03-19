@@ -47,6 +47,11 @@ Krist.freeNonceSubmission = false;
 
 Krist.workOverTime = [];
 
+Krist.checkGenesisBlockStatus = async function () {
+  const lastBlock = await schemas.block.findOne({ order: [["id", "DESC"]] });
+  return Boolean(lastBlock);
+}
+
 Krist.init = async function () {
   console.log(chalk`{bold [Krist]} Loading...`);
 
@@ -65,8 +70,7 @@ Krist.init = async function () {
   if (process.env.GEN_GENESIS === "true") await Krist.genGenesis();
 
   // Check for a genesis block
-  const lastBlock = await schemas.block.findOne({ order: [["id", "DESC"]] });
-  if (!lastBlock) {
+  if (!(await Krist.checkGenesisBlockStatus())) {
     console.log(chalk`{yellow.bold [Krist]} Warning: Genesis block not found. Mining may not behave correctly.`);
   }
 
@@ -92,7 +96,7 @@ Krist.init = async function () {
 Krist.genGenesis = async function () {
   const r = getRedis();
 
-  if (!await r.exists("genesis-genned")) {
+  if ((!await Krist.checkGenesisBlockStatus()) || (!await r.exists("genesis-genned"))) {
     await schemas.block.create({
       value: 50,
       hash: "0000000000000000000000000000000000000000000000000000000000000000",
@@ -101,6 +105,7 @@ Krist.genGenesis = async function () {
       difficulty: 4294967295,
       time: new Date()
     });
+
     await r.set("genesis-genned", "true");
   }
 }
