@@ -1,4 +1,4 @@
-FROM node:15
+FROM node:15-alpine
 
 WORKDIR /usr/src/krist
 
@@ -6,9 +6,17 @@ WORKDIR /usr/src/krist
 COPY package*.json ./
 COPY yarn.lock /
 
+# Install packages
 RUN \
-    apk add git ca-certificates && \
-    yarn install
+    apk add --no-cache --update \
+        git \
+        ca-certificates \
+        python2 && \
+    update-ca-certificates --fresh && \
+    rm -rf /var/cache/apk/*
+
+# Install dependencies
+RUN yarn install
 
 # Install source
 COPY . .
