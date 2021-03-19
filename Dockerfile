@@ -1,5 +1,7 @@
 FROM node:15-alpine
 
+MAINTAINER Nejc Drobnic <yo@quantumlytangled.com>
+
 WORKDIR /usr/src/krist
 
 # Install packages
