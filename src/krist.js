@@ -98,11 +98,11 @@ Krist.genGenesis = async function () {
 
   if ((!await Krist.checkGenesisBlockStatus()) || (!await r.exists("genesis-genned"))) {
     await schemas.block.create({
-      value: 50,
+      value: Krist.getDefaultBlockValue(),
       hash: "0000000000000000000000000000000000000000000000000000000000000000",
       address: "0000000000",
       nonce: 0,
-      difficulty: 4294967295,
+      difficulty: Krist.getMaxWork(),
       time: new Date()
     });
 
@@ -125,6 +125,10 @@ Krist.getWorkOverTime = async function () {
 Krist.setWork = async function (work) {
   await getRedis().set("work", work);
 };
+
+Krist.getDefaultBlockValue = function () {
+  return constants.defaultBlockValue;
+}
 
 Krist.getWalletVersion = function () {
   return constants.walletVersion;

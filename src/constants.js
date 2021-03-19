@@ -20,6 +20,7 @@
  */
 
 module.exports = {
+  defaultBlockValue: 50,
   walletVersion: 16,
   nonceMaxSize: 24,
   nameCost: 500,
