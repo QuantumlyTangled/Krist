@@ -14,7 +14,7 @@ a live copy of the API documentation [here](http://krist.ceriat.net/docs).
 ## Docker Installation
 
 The preferred method of installation is Docker. The Docker images are published
-on the GitHub Container Registry under `ghcr.io/tmpim/krist`.
+on the GitHub Container Registry under `ghcr.io/quantumlytangled/krist` or `quantumlytangled/krist`.
 
 MySQL/MariaDB and Redis are required too. There are two options to connect to
 the databases. The easier way is to run MySQL and Redis on the host machine,
@@ -28,12 +28,14 @@ Example usage with Docker Compose:
 version: "3.9"
 services:
   krist:
-    image: "ghcr.io/tmpim/krist:latest"
+    image: "quantumlytangled/krist"
     environment:
       - DB_PASS=${DB_PASS}
       - PUBLIC_URL=krist.ceriat.net
       - DB_HOST=172.17.0.1
       - REDIS_HOST=172.17.0.1
+      - MINING_ENABLED=true
+      - GEN_GENESIS=true
     ports:
       - "127.0.0.1:8080:8080"
     restart: unless-stopped
