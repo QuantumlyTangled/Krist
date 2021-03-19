@@ -1,0 +1,22 @@
+name: Change Image Meta values'
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  docker_hub_description:
+    name: Update Docker Hub image description
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out the repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 5
+
+    - name: Update Docker Hub description
+      uses: peter-evans/dockerhub-description@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: ${{ github.repository }}
